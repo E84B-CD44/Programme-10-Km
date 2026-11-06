@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>Mon programme 10 km</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#0b1220;--panel:#151f30;--panel2:#1d2a3e;--text:#f4f7fb;--muted:#a8b5c7;--accent:#70e0b2;--blue:#79b8ff;--line:#2b3a50;--orange:#ffca7a}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#101b2d,#0b1220 45%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 14px calc(28px + env(safe-area-inset-bottom));}
+header{padding:22px 4px 16px} .eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+h1{font-size:29px;line-height:1.05;margin:8px 0} .sub{color:var(--muted);font-size:14px;line-height:1.45}
+.hero{background:linear-gradient(135deg,#1d3850,#17263a);border:1px solid #34506a;border-radius:22px;padding:17px;margin:8px 0 16px}
+.hero strong{font-size:17px}.hero p{color:#d0dce9;margin:7px 0 0;font-size:13px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{background:#0e1b2a88;border-radius:13px;padding:10px}.stat b{display:block;font-size:20px}.stat span{font-size:10px;color:var(--muted)}
+.progress-wrap{background:#26364a;border-radius:20px;height:8px;margin-top:12px;overflow:hidden}.progress{height:100%;width:0;background:var(--accent);transition:width .2s}
+.toolbar{display:flex;gap:8px;overflow:auto;padding:4px 0 13px}.tab{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 14px;border-radius:30px;font-weight:700}.tab.active{background:var(--accent);color:#082016;border-color:var(--accent)}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 10px}.section-title h2{font-size:19px;margin:0}.small{font-size:12px;color:var(--muted)}
+.day{background:var(--panel);border:1px solid var(--line);border-radius:18px;margin:10px 0;padding:14px}.day.done{border-color:#3a8069;background:#122b2a}.day-top{display:flex;gap:10px;align-items:flex-start}.check{width:24px;height:24px;accent-color:var(--accent);flex:none;margin-top:2px}.day-head{flex:1}.day-name{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.8px}.day h3{margin:3px 0 3px;font-size:17px}.duration{font-size:12px;color:var(--muted)}
+.details{margin:12px 0 0 34px;padding:11px;background:var(--panel2);border-radius:12px;font-size:13px;line-height:1.55;color:#dbe5f0}.details ul{margin:0;padding-left:18px}.details li{margin:3px 0}
+.entry{margin:12px 0 0 34px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.field label{display:block;font-size:10px;color:var(--muted);margin:0 0 4px 2px}.field input,.field textarea{width:100%;background:#0c1625;border:1px solid #34465e;color:var(--text);border-radius:10px;padding:10px;font:inherit;font-size:14px;min-width:0}.field textarea{grid-column:1/-1;min-height:54px;resize:vertical}.wide{grid-column:1/-1}
+.rest{color:var(--muted);font-size:13px;padding:13px 4px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:12px 0}.panel h3{margin:0 0 9px;font-size:16px}.panel p{color:var(--muted);font-size:13px;line-height:1.5;margin:5px 0}
+.pacegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pace{background:var(--panel2);border-radius:12px;padding:10px}.pace b{display:block;font-size:14px}.pace span{color:var(--muted);font-size:11px}
+button.action{border:0;background:var(--accent);color:#092016;padding:11px 14px;border-radius:12px;font-weight:800;font-size:13px}button.secondary{background:#26364a;color:var(--text);border:1px solid var(--line)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+footer{text-align:center;color:#8190a5;font-size:11px;padding:18px 5px}
+.hidden{display:none!important}
+@media(min-width:700px){body{max-width:760px;margin:auto}.entry{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">Plan d'entraînement · 4 semaines</div>
+ <h1>Objectif 10 km</h1>
+ <div class="sub">Tapis + home trainer · Objectif indicatif : tenter de passer sous 1 heure, selon tes sensations.</div>
+</header>
+<section class="hero">
+ <strong>Ton suivi d'entraînement</strong>
+ <p>Coche chaque séance terminée et renseigne tes résultats. Tes données sont enregistrées sur cet iPhone.</p>
+ <div class="stats">
+  <div class="stat"><b id="doneCount">0/24</b><span>SÉANCES VALIDÉES</span></div>
+  <div class="stat"><b id="percent">0 %</b><span>PROGRESSION</span></div>
+  <div class="stat"><b>4 sem.</b><span>PROGRAMME</span></div>
+ </div>
+ <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+</section>
+<nav class="toolbar" id="tabs"></nav>
+<main id="content"></main>
+<section class="panel">
+ <h3>⚙️ Tes repères</h3>
+ <div class="pacegrid">
+  <div class="pace"><b>7 km/h</b><span>Récupération</span></div>
+  <div class="pace"><b>7,5–8 km/h</b><span>Endurance</span></div>
+  <div class="pace"><b>8–8,5 km/h</b><span>Endurance active</span></div>
+  <div class="pace"><b>9–9,5 km/h</b><span>Intervalles</span></div>
+  <div class="pace"><b>10 km/h</b><span>6 min/km</span></div>
+  <div class="pace"><b>0–1 %</b><span>Inclinaison tapis</span></div>
+  <div class="pace"><b>90–105 W</b><span>Vélo facile</span></div>
+  <div class="pace"><b>110–125 W</b><span>Vélo endurance</span></div>
+ </div>
+ <p>Home trainer : FTP de référence 190 W. 125–135 W uniquement si confortable.</p>
+</section>
+<section class="panel">
+ <h3>📊 Bilan personnel</h3>
+ <div class="entry" style="margin:0">
+  <div class="field"><label>Poids (kg)</label><input id="weight" type="number" step="0.1" placeholder="Ex. 110"></div>
+  <div class="field"><label>Date du bilan</label><input id="weightDate" type="date"></div>
+  <div class="field wide"><label>Commentaire</label><input id="weightNote" placeholder="Forme, sensations…"></div>
+ </div>
+ <div class="actions"><button class="action" onclick="saveWeight()">Enregistrer le bilan</button><button class="action secondary" onclick="exportData()">Exporter mes données</button><button class="action secondary" onclick="resetData()">Réinitialiser</button></div>
+ <p id="weightSaved"></p>
+</section>
+<footer>Programme indicatif — adapte selon tes sensations. En cas de douleur inhabituelle, vertige ou malaise, arrête la séance.</footer>
+<script>
+const weeks = [
+ {name:"Semaine 1",subtitle:"Mise en route",days:[
+ ["LUNDI","Repos","",["Repos et récupération."]],
+ ["MARDI","Home trainer","45 min",["10 min à 90–105 W (échauffement).","25 min à 110–125 W (endurance facile).","5 min à 125–135 W, seulement si confortable.","5 min à 90–100 W (retour au calme)."]],
+ ["MERCREDI","Tapis","Env. 40 min",["10 min à 7,5 km/h.","5 fois : 2 min à 9–9,5 km/h + 2 min à 7 km/h.","10 min à 7,5–8 km/h.","Inclinaison : 0–1 %. Si trop difficile, reste à 9 km/h."]],
+ ["JEUDI","Repos","",["Repos."]],
+ ["VENDREDI","Tapis","35 min",["5 min à 7 km/h.","25 min à 8 km/h.","5 min à 7 km/h. Inclinaison : 0–1 %."]],
+ ["SAMEDI","Home trainer","1 h 15",["10 min à 90–105 W.","45 min à 110–125 W.","10 min à 125–135 W si facile.","10 min à 90–100 W."]],
+ ["DIMANCHE","Tapis","45 min",["5 min à 7 km/h.","30 min à 7,5–8 km/h.","5 min à 8–8,5 km/h si facile.","5 min à 7 km/h.","Si besoin : alterne 4 min de course et 1 min de marche."]]
+ ]},
+ {name:"Semaine 2",subtitle:"Progression",days:[
+ ["LUNDI","Repos","",["Repos."]],
+ ["MARDI","Home trainer","45 min",["10 min à 90–105 W.","25 min à 110–125 W (endurance tempo léger).","5 min à 125–135 W si confortable.","5 min à 90–100 W."]],
+ ["MERCREDI","Tapis","Env. 45 min",["10 min à 7,5–8 km/h.","4 fois : 4 min à 9–9,5 km/h + 3 min à 7 km/h.","7 min à 7–7,5 km/h.","Inclinaison : 0–1 %. Si besoin, fais les répétitions à 9 km/h."]],
+ ["JEUDI","Repos","",["Repos."]],
+ ["VENDREDI","Tapis","40 min",["5 min à 7 km/h.","25 min à 8–8,5 km/h.","5 min à 8,5–9 km/h si facile.","5 min à 7 km/h."]],
+ ["SAMEDI","Home trainer","1 h 20",["10 min à 90–105 W.","50 min à 110–125 W.","10 min à 125–135 W si facile.","10 min à 90–100 W."]],
+ ["DIMANCHE","Tapis","50 min",["5 min à 7 km/h.","30 min à 7,5–8 km/h.","5 min à 8–8,5 km/h si facile.","5 min à 7,5–8 km/h.","5 min à 7 km/h."]]
+ ]},
+ {name:"Semaine 3",subtitle:"Allure objectif",days:[
+ ["LUNDI","Repos","",["Repos."]],
+ ["MARDI","Home trainer","40 min",["10 min à 90–105 W.","20 min à 110–125 W.","5 min à 125–135 W si confortable.","5 min à 90–100 W."]],
+ ["MERCREDI","Tapis","Env. 45 min",["10 min à 7,5–8 km/h.","3 fois : 5 min à 9,5 km/h + 3 min à 7 km/h.","Sur la 3e répétition, passe à 10 km/h uniquement si très à l’aise.","11 min à 7–7,5 km/h.","Inclinaison : 0–1 %."]],
+ ["JEUDI","Repos","",["Repos."]],
+ ["VENDREDI","Tapis","35 min",["5 min à 7 km/h.","20 min à 8–8,5 km/h.","5 min à 8,5 km/h si facile.","5 min à 7 km/h."]],
+ ["SAMEDI","Home trainer","1 h",["10 min à 90–105 W.","35 min à 110–125 W.","5 min à 125–135 W si confortable.","10 min à 90–100 W."]],
+ ["DIMANCHE","Tapis","50 min",["5 min à 7 km/h.","30 min à 7,5–8 km/h.","5 min à 8,5 km/h si facile.","5 min à 7,5–8 km/h.","5 min à 7 km/h."]]
+ ]},
+ {name:"Semaine 4",subtitle:"Objectif 10 km",days:[
+ ["LUNDI","Repos","",["Repos."]],
+ ["MARDI","Home trainer","35 min",["10 min à 90–100 W.","15 min à 105–120 W.","10 min à 90–100 W."]],
+ ["MERCREDI","Tapis","30 min",["10 min à 7,5 km/h.","4 fois : 1 min à 9,5 km/h + 2 min à 7 km/h.","8 min à 7–7,5 km/h.","Cette séance doit rester facile."]],
+ ["JEUDI","Repos","",["Repos."]],
+ ["VENDREDI","Footing facultatif","20 min",["5 min à 7 km/h.","10 min à 7,5–8 km/h.","5 min à 7 km/h.","Si tu es fatigué, repose-toi."]],
+ ["SAMEDI","Repos","",["Repos, pas de sortie vélo longue."]],
+ ["DIMANCHE","Tentative 10 km","Objectif < 60 min",["Échauffement : 10 min faciles.","Départ prudent, autour de 6:05/km.","Après 5–6 km, accélère légèrement seulement si tu es bien.","Ralentis si nécessaire ; arrête-toi en cas de douleur ou de malaise.","Route préférable au tapis."]]
+ ]}
+];
+const storeKey="suivi10km_v2";
+let data=JSON.parse(localStorage.getItem(storeKey)||"{}");
+let current=0;
+const content=document.getElementById("content"), tabs=document.getElementById("tabs");
+function key(w,d){return "w"+w+"d"+d}
+function save(){localStorage.setItem(storeKey,JSON.stringify(data));updateProgress()}
+function updateProgress(){
+ let count=0,total=0;
+ weeks.forEach((w,wi)=>w.days.forEach((d,di)=>{if(d[1]!=="Repos" || d[0]!=="LUNDI" && d[0]!=="JEUDI" && d[0]!=="SAMEDI") total++; if(data[key(wi,di)]?.done)count++}));
+ // Le compteur suit les séances d'entraînement, sans compter les jours de repos.
+ document.getElementById("doneCount").textContent=count+"/19";
+ let pct=Math.round(count/19*100);document.getElementById("percent").textContent=pct+" %";document.getElementById("progress").style.width=pct+"%";
+}
+function renderTabs(){tabs.innerHTML=weeks.map((w,i)=>`<button class="tab ${i===current?"active":""}" onclick="showWeek(${i})">${w.name}</button>`).join("")}
+function showWeek(i){current=i;renderTabs();renderWeek()}
+function renderWeek(){
+ const w=weeks[current];
+ content.innerHTML=`<div class="section-title"><h2>${w.name} — ${w.subtitle}</h2><span class="small">7 jours</span></div>`;
+ w.days.forEach((d,di)=>{
+  const k=key(current,di),v=data[k]||{},isRest=d[1]==="Repos";
+  if(isRest){content.innerHTML+=`<div class="rest">○ ${d[0]} — Repos et récupération</div>`;return}
+  const details=d[3].map(x=>`<li>${x}</li>`).join("");
+  content.innerHTML+=`<article class="day ${v.done?"done":""}">
+   <div class="day-top"><input class="check" type="checkbox" ${v.done?"checked":""} aria-label="Séance terminée" onchange="updateField('${k}','done',this.checked)">
+    <div class="day-head"><div class="day-name">${d[0]}</div><h3>${d[1]}</h3><div class="duration">${d[2]}</div></div>
+   </div>
+   <div class="details"><ul>${details}</ul></div>
+   <div class="entry">
+    <div class="field"><label>Durée réalisée (min)</label><input type="number" inputmode="decimal" placeholder="Ex. 45" value="${v.duration||""}" onchange="updateField('${k}','duration',this.value)"></div>
+    <div class="field"><label>Distance (km)</label><input type="number" inputmode="decimal" step="0.01" placeholder="Ex. 6,2" value="${v.distance||""}" onchange="updateField('${k}','distance',this.value)"></div>
+    <div class="field"><label>Fréquence cardiaque moy. (bpm)</label><input type="number" inputmode="numeric" placeholder="Ex. 145" value="${v.hr||""}" onchange="updateField('${k}','hr',this.value)"></div>
+    <div class="field"><label>Dénivelé (m)</label><input type="number" inputmode="numeric" placeholder="Ex. 80" value="${v.elevation||""}" onchange="updateField('${k}','elevation',this.value)"></div>
+    <div class="field wide"><label>Allure / puissance / sensations</label><input placeholder="Ex. 8 km/h · 120 W · bonnes sensations" value="${v.notes||""}" onchange="updateField('${k}','notes',this.value)"></div>
+   </div>
+  </article>`;
+ });
+ updateProgress();
+}
+function updateField(k,f,val){data[k]=data[k]||{};data[k][f]=val;save();if(f==="done")renderWeek()}
+function saveWeight(){
+ data.weight={value:document.getElementById("weight").value,date:document.getElementById("weightDate").value,note:document.getElementById("weightNote").value};
+ save();document.getElementById("weightSaved").textContent="Bilan enregistré sur cet iPhone.";
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify({programme:"10 km - 4 semaines",exported:new Date().toISOString(),data},null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mon-suivi-10km.json";a.click();URL.revokeObjectURL(a.href);
+}
+function resetData(){if(confirm("Effacer toutes les séances et données enregistrées sur cet iPhone ?")){data={};save();renderWeek();document.getElementById("weight").value="";document.getElementById("weightDate").value="";document.getElementById("weightNote").value="";document.getElementById("weightSaved").textContent="";}}
+if(data.weight){document.getElementById("weight").value=data.weight.value||"";document.getElementById("weightDate").value=data.weight.date||"";document.getElementById("weightNote").value=data.weight.note||""}
+renderTabs();renderWeek();updateProgress();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body></html>

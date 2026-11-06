@@ -1,0 +1,10 @@
+{
+  "name": "Mon programme 10 km",
+  "short_name": "Suivi 10 km",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#101827",
+  "lang": "fr",
+  "description": "Suivi du programme 10 km sur quatre semaines."
+}

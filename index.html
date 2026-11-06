@@ -129,7 +129,14 @@ function renderTabs(){tabs.innerHTML=weeks.map((w,i)=>`<button class="tab ${i===
 function showWeek(i){current=i;renderTabs();renderWeek()}
 function renderWeek(){
  const w=weeks[current];
- content.innerHTML=`<div class="section-title"><h2>${w.name} — ${w.subtitle}</h2><span class="small">7 jours</span></div>`;
+ const weekKcal = w.days.reduce((sum,d,di)=>sum + (Number(data[key(current,di)]?.calories)||0),0);
+ const allKcal = weeks.reduce((sum,ww,wi)=>sum + ww.days.reduce((sub,d,di)=>sub + (Number(data[key(wi,di)]?.calories)||0),0),0);
+ content.innerHTML=`<div class="section-title"><h2>${w.name} — ${w.subtitle}</h2><span class="small">7 jours</span></div>
+ <div class="panel" style="margin-top:0"><div class="stats" style="margin-top:0">
+ <div class="stat"><b>${weekKcal.toLocaleString("fr-FR")}</b><span> kcal cette semaine</span></div>
+ <div class="stat"><b>${allKcal.toLocaleString("fr-FR")}</b><span> kcal au total</span></div>
+ <div class="stat"><b>${w.days.filter((d,di)=>Number(data[key(current,di)]?.calories)>0).length}</b><span> séances renseignées</span></div>
+ </div></div>`;
  w.days.forEach((d,di)=>{
   const k=key(current,di),v=data[k]||{},isRest=d[1]==="Repos";
   if(isRest){content.innerHTML+=`<div class="rest">○ ${d[0]} — Repos et récupération</div>`;return}
@@ -144,13 +151,14 @@ function renderWeek(){
     <div class="field"><label>Distance (km)</label><input type="number" inputmode="decimal" step="0.01" placeholder="Ex. 6,2" value="${v.distance||""}" onchange="updateField('${k}','distance',this.value)"></div>
     <div class="field"><label>Fréquence cardiaque moy. (bpm)</label><input type="number" inputmode="numeric" placeholder="Ex. 145" value="${v.hr||""}" onchange="updateField('${k}','hr',this.value)"></div>
     <div class="field"><label>Dénivelé (m)</label><input type="number" inputmode="numeric" placeholder="Ex. 80" value="${v.elevation||""}" onchange="updateField('${k}','elevation',this.value)"></div>
+    <div class="field"><label>Calories dépensées (kcal)</label><input type="number" inputmode="numeric" placeholder="Ex. 450" value="${v.calories||""}" onchange="updateField('${k}','calories',this.value)"></div>
     <div class="field wide"><label>Allure / puissance / sensations</label><input placeholder="Ex. 8 km/h · 120 W · bonnes sensations" value="${v.notes||""}" onchange="updateField('${k}','notes',this.value)"></div>
    </div>
   </article>`;
  });
  updateProgress();
 }
-function updateField(k,f,val){data[k]=data[k]||{};data[k][f]=val;save();if(f==="done")renderWeek()}
+function updateField(k,f,val){data[k]=data[k]||{};data[k][f]=val;save();if(f==="done" || f==="calories")renderWeek()}
 function saveWeight(){
  data.weight={value:document.getElementById("weight").value,date:document.getElementById("weightDate").value,note:document.getElementById("weightNote").value};
  save();document.getElementById("weightSaved").textContent="Bilan enregistré sur cet iPhone.";
